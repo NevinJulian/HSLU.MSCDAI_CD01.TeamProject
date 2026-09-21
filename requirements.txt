@@ -12,3 +12,6 @@ scikit-learn>=1.4
 # Running the .ipynb notebooks
 jupyter>=1.0
 ipykernel>=6.29
+
+# Repo hygiene: strips notebook outputs on commit (NDA), see README
+nbstripout>=0.7
