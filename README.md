@@ -49,10 +49,16 @@ data/raw/sow_category.csv
 data/raw/sow_category_counterpart.csv
 ```
 
-Then run the cleaning script once, it writes the cleaned copies to `data/processed/`:
+Notebooks load the data through `src/data.py` (see `docs/data_preparation.md`). If you want the cleaned tables as CSV, for Excel or Power BI:
 
 ```bash
 python src/clean_data.py
+```
+
+Checks that the cleaning holds:
+
+```bash
+pytest
 ```
 
 ### 5. Deactivating
@@ -70,16 +76,18 @@ deactivate
 │   └── processed/          # output of src/clean_data.py, gitignored
 ├── doc/                    # course briefs (PDF)
 ├── docs/                   # our written deliverables (research questions, findings, recommendations)
-├── example_code/           # starter notebook provided by the course
 ├── notebooks/
 │   ├── 00_ideation.ipynb   # first look at the data and the wallet-leakage case
 │   └── 02_eda_first_look.ipynb
 ├── src/
-│   └── clean_data.py       # cleans data/raw -> data/processed
+│   ├── data.py             # loaders with all cleaning applied, use these in notebooks
+│   ├── features.py         # customer feature table
+│   ├── mappings.py         # category and counterpart names and groups
+│   └── clean_data.py       # writes the cleaned tables to data/processed/ as CSV
 ├── dashboard/              # Streamlit app (issue 12)
 ├── figures/                # exported charts for the presentation
 ├── results/                # model outputs with customer ids, gitignored
-├── tests/
+├── tests/                  # pytest checks on the cleaned data
 └── requirements.txt
 ```
 
