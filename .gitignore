@@ -1,0 +1,20 @@
+# Python virtual environments (rename/add here if you used a different name)
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data: contains sensitive customer data, must never be pushed to the repo.
+# Everything under data/ (raw and processed) is ignored, including any
+# future files added there.
+data/
