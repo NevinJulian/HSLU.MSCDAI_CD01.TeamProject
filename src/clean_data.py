@@ -1,11 +1,11 @@
 """
-01_clean_data.py
+src/clean_data.py
 
-Fixes the data quality issues found in 02_Exploratory_Data_Analysis.ipynb and
+Fixes the data quality issues found in notebooks/02_eda_first_look.ipynb and
 writes tidy copies to data/processed/. Run from anywhere (paths are resolved
 relative to this file, not the current working directory):
 
-    python 01_clean_data.py
+    python src/clean_data.py
 
 1. data/raw/customer_data.csv
    - `cat_lebensmittel` (German for "groceries") is a mislabeled duplicate of
@@ -37,7 +37,7 @@ does not meaningfully affect any of the SOW analysis.
 from pathlib import Path
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 PROCESSED.mkdir(parents=True, exist_ok=True)

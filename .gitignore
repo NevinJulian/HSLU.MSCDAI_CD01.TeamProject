@@ -2,6 +2,7 @@
 .venv/
 venv/
 env/
+.CDA/
 
 # Python cache
 __pycache__/
@@ -18,3 +19,7 @@ Thumbs.db
 # Everything under data/ (raw and processed) is ignored, including any
 # future files added there.
 data/
+*.parquet
+
+# Model outputs with customer ids (churn predictions go to ILIAS, not to git)
+results/

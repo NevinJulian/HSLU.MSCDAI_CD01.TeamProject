@@ -1,0 +1,10 @@
+# LF in the repo, native line endings on checkout
+* text=auto
+
+# binaries
+*.pdf binary
+*.png binary
+*.parquet binary
+
+# strip notebook outputs on commit (each member runs: nbstripout --install)
+*.ipynb filter=nbstripout
