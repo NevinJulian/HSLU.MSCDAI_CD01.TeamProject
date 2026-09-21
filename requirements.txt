@@ -15,3 +15,6 @@ ipykernel>=6.29
 
 # Repo hygiene: strips notebook outputs on commit (NDA), see README
 nbstripout>=0.7
+
+# Tests: `pytest` from the repo root
+pytest>=8
