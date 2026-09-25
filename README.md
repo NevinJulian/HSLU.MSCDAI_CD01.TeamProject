@@ -75,7 +75,7 @@ deactivate
 │   ├── raw/                # original CSVs, never edited, gitignored
 │   └── processed/          # output of src/clean_data.py, gitignored
 ├── doc/                    # course briefs (PDF)
-├── docs/                   # our written deliverables (research questions, findings, recommendations)
+├── docs/                   # our written deliverables, incl. assumptions.md (decisions we could not verify)
 ├── notebooks/
 │   ├── 00_ideation.ipynb   # first look at the data and the wallet-leakage case
 │   └── 02_eda_first_look.ipynb
@@ -92,6 +92,8 @@ deactivate
 ```
 
 Notebooks live in `notebooks/` and resolve the repo root themselves, so they run from the root or from `notebooks/`. Anything with customer ids (`data/`, `results/`, `*.parquet`) stays out of git.
+
+Anything we assume without being able to prove it goes into `docs/assumptions.md`, one entry per decision, with what happens if it turns out wrong.
 
 ## Workflow
 

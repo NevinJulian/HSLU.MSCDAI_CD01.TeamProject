@@ -93,7 +93,7 @@ The same company appears in several categories because the category comes from t
 
 ### 7. `cash` and `savings` are transfers, not cash
 
-The counterparts of `cash` are revolut 22 %, binance 8 %, postfinance 7 %, kantonalbank 5 %, ubs 5 %, twint 2 %, `other` 52 %. The counterparts of `savings` are revolut and coinbase. Both categories are money leaving the bank for other financial providers. Revolut moves from `savings` to `cash` in 2022Q1 (recategorisation in the source), so the two categories are read together everywhere (`features.LEAKAGE_COLUMNS`, `mappings.LEAKAGE_GROUPS`).
+The counterparts of `cash` are revolut 22 %, binance 8 %, postfinance 7 %, kantonalbank 5 %, ubs 5 %, twint 2 %, `other` 52 %. The counterparts of `savings` are revolut and coinbase. Both categories are treated as money leaving the bank for other financial providers. This is an assumption, the bank rows could also be ATM withdrawals, see `docs/assumptions.md` A1. Revolut moves from `savings` to `cash` in 2022Q1 (recategorisation in the source), so the two categories are read together everywhere (`features.LEAKAGE_COLUMNS`, `mappings.LEAKAGE_GROUPS`).
 
 ### 8. Gaps in the currency and country columns
 
