@@ -83,12 +83,12 @@ def cross_validate(model, X: pd.DataFrame, y: np.ndarray, n_splits: int = 5, n_r
         m = clone(model).fit(X.iloc[tr], y[tr])
         oof[r, te] = m.predict_proba(X.iloc[te])[:, 1]
         if (i + 1) % n_splits == 0:
-            per_repeat.append(_metrics(y, oof[r]))
+            per_repeat.append(oof_metrics(y, oof[r]))
     summary = {k: (np.mean([d[k] for d in per_repeat]), np.std([d[k] for d in per_repeat])) for k in per_repeat[0]}
     return oof.mean(axis=0), summary
 
 
-def _metrics(y: np.ndarray, p: np.ndarray, threshold: float = 0.5) -> dict:
+def oof_metrics(y: np.ndarray, p: np.ndarray, threshold: float = 0.5) -> dict:
     return {
         "accuracy": accuracy_score(y, p >= threshold),
         "auc": roc_auc_score(y, p),
@@ -143,3 +143,62 @@ def write_handin(ids: np.ndarray, proba: np.ndarray, threshold: float,
     path.parent.mkdir(parents=True, exist_ok=True)
     out.sort_values(ID).to_csv(path, index=False)
     return out
+
+
+# --------------------------------------------------------------------------- tuning
+def tune(make_model, param_space, X: pd.DataFrame, y: np.ndarray, n_trials: int = 50,
+          n_splits: int = 5, seed: int = 0, cache: Path | None = None, name: str | None = None) -> dict:
+    """Optuna search minimising out-of-fold log loss on a single stratified
+    k-fold. `make_model(params)` returns an estimator, `param_space(trial)` a
+    params dict. With `cache` and `name`, the best params are stored in a JSON
+    file and reused on the next run, so tuning happens once."""
+    import json
+
+    import optuna
+    from sklearn.model_selection import StratifiedKFold
+
+    if cache is not None and name is not None and cache.exists():
+        stored = json.loads(cache.read_text())
+        if name in stored:
+            return stored[name]
+
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+    folds = list(StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed).split(X, y))
+
+    def objective(trial):
+        params = param_space(trial)
+        p = np.zeros(len(y))
+        for tr, te in folds:
+            m = make_model(params).fit(X.iloc[tr], y[tr])
+            p[te] = m.predict_proba(X.iloc[te])[:, 1]
+        return log_loss(y, np.clip(p, 1e-6, 1 - 1e-6))
+
+    study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=seed))
+    study.optimize(objective, n_trials=n_trials, show_progress_bar=False)
+    best = study.best_params
+
+    if cache is not None and name is not None:
+        stored = json.loads(cache.read_text()) if cache.exists() else {}
+        stored[name] = best
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text(json.dumps(stored, indent=2))
+    return best
+
+
+# --------------------------------------------------------------------------- ensembles
+def rank_average(probas: list[np.ndarray]) -> np.ndarray:
+    """Average of per-model probability ranks, scaled to [0, 1]. Robust to
+    models with different calibration."""
+    from scipy.stats import rankdata
+
+    ranks = [rankdata(p) / len(p) for p in probas]
+    return np.mean(ranks, axis=0)
+
+
+def fit_stack(oof: pd.DataFrame, y: np.ndarray, C: float = 1.0):
+    """Logistic regression on the out-of-fold probabilities of the base models.
+    The base probabilities are already out-of-sample, the meta-model's own
+    cross-validation is done by the caller (cross_validate on the same table)."""
+    from sklearn.linear_model import LogisticRegression
+
+    return LogisticRegression(C=C, max_iter=2000).fit(oof, y)
