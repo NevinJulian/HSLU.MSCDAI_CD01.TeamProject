@@ -6,8 +6,13 @@ numpy==2.2.6
 matplotlib==3.10.9
 seaborn==0.13.2
 
-# Modeling (used in example_code.ipynb / churn prediction)
+# Modeling (churn prediction, notebooks/08*)
 scikit-learn>=1.4
+lightgbm>=4.3
+xgboost>=2.0
+catboost>=1.2
+optuna>=3.6
+shap>=0.45
 
 # Running the .ipynb notebooks
 jupyter>=1.0
