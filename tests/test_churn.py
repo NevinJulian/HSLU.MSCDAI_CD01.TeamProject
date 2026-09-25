@@ -45,3 +45,18 @@ def test_write_handin_validates_ids(feats, tmp_path):
         write_handin(ids[:-1], proba[:-1], 0.5, path=tmp_path / "bad.csv")
     with pytest.raises(AssertionError):
         write_handin(np.append(ids[:-1], -1), proba, 0.5, path=tmp_path / "bad2.csv")
+
+
+def test_rank_average_and_stack():
+    import pandas as pd
+
+    from src.churn import fit_stack, rank_average
+
+    rng = np.random.default_rng(0)
+    y = rng.integers(0, 2, 500)
+    p1 = np.clip(y * 0.6 + rng.normal(0, 0.3, 500), 0, 1)
+    p2 = np.clip(y * 0.5 + rng.normal(0, 0.3, 500), 0, 1)
+    r = rank_average([p1, p2])
+    assert r.min() >= 0 and r.max() <= 1 and len(r) == 500
+    meta = fit_stack(pd.DataFrame({"a": p1, "b": p2}), y)
+    assert meta.predict_proba(pd.DataFrame({"a": p1, "b": p2})).shape == (500, 2)
