@@ -23,3 +23,7 @@ nbstripout>=0.7
 
 # Tests: `pytest` from the repo root
 pytest>=8
+
+# Dashboard
+plotly>=7.1.0
+streamlit>=1.64.0
