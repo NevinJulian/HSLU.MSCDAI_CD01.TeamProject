@@ -1,5 +1,3 @@
-"""Sanity checks on the cleaned data. Run with `pytest` from the repo root."""
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -40,7 +38,6 @@ def feats():
     return build_customer_features(load_customer_table())
 
 
-# --------------------------------------------------------------------------- customers
 def test_one_row_per_customer(cust):
     assert len(cust) == 5576
     assert cust["customer_id"].is_unique
@@ -87,7 +84,6 @@ def test_customer_table_split():
     assert t.loc[t["split"] == "train", "churned"].notna().all()
 
 
-# --------------------------------------------------------------------------- share of wallet
 def test_sow_window_and_keys(sow):
     assert sow["date"].min() == pd.Timestamp("2021-01-01")
     assert sow["date"].max() == pd.Timestamp("2023-12-01")
@@ -135,7 +131,6 @@ def test_monthly_active_is_plausible(sow):
     assert 600 < active.min() and active.max() < 2000
 
 
-# --------------------------------------------------------------------------- features
 def test_features_shape_and_ranges(feats):
     assert len(feats) == 5576
     shares = [c for c in feats.columns if c.endswith("_share")]
