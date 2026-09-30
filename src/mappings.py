@@ -25,6 +25,9 @@ PAYMENT_PROVIDERS = {"sumup", "paypal", "twint"}
 
 FINANCIAL_PROVIDERS = {"revolut", "binance", "coinbase", "postfinance", "ubs", "kantonalbank"}
 
+# card top-ups, 100 % e-commerce in the data. the bank rows are point of sale, see assumptions A1
+LEAKAGE_ONLINE = {"revolut", "binance", "coinbase", "twint"}
+
 
 def counterpart_type(name: str) -> str:
     if name == "other":
