@@ -1,16 +1,4 @@
-"""Loaders for the YAPEAL data with all cleaning applied.
-
-Every notebook and the dashboard read the data through these functions, never
-from the CSVs directly:
-
-    import sys; from pathlib import Path
-    sys.path.insert(0, str(Path.cwd().parent))          # from notebooks/
-    from src.data import load_customers, load_sow, load_sow_counterpart
-
-The cleaning decisions and the rows they touch are documented in
-docs/data_preparation.md. `python src/clean_data.py` writes the cleaned tables
-to data/processed/ for anyone who prefers CSVs (Excel, Power BI).
-"""
+"""Loaders for the raw CSVs with the cleaning from docs/data_preparation.md applied."""
 
 from pathlib import Path
 
@@ -22,23 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 
-# The data window. 12-2020 holds three transactions of one customer.
-START = pd.Timestamp("2021-01-01")
+START = pd.Timestamp("2021-01-01")  # 12-2020 is one customer, dropped
 
 CATEGORY_PREFIX, CURRENCY_PREFIX, COUNTRY_PREFIX = "cat_", "cur_", "country_"
 
 
-# --------------------------------------------------------------------------- customers
 def load_customers(raw: Path = RAW) -> pd.DataFrame:
-    """One row per customer, aggregated over the whole window.
-
-    Cleaning:
-    - duplicate category columns folded into their real category and dropped
-      (cat_restaurant -> cat_restaurants, cat_lebensmittel -> cat_groceries,
-      cat_hotel -> cat_holidays, cat_fitness -> cat_wellness)
-    - cur_other: spend not covered by the listed currencies (3.6 % of all spend)
-    - country_other: transactions not covered by the listed countries (12.8 %)
-    """
+    """One row per customer, duplicate category columns merged, gaps as cur_other / country_other."""
     df = pd.read_csv(raw / "customer_data.csv")
     for src, dst in M.CUSTOMER_COLUMN_MERGES.items():
         if src in df:
@@ -61,11 +39,7 @@ def load_predict(raw: Path = RAW) -> pd.DataFrame:
 
 
 def load_customer_table(raw: Path = RAW) -> pd.DataFrame:
-    """Customers with the churn label attached.
-
-    `churned` is True/False for the 3 903 labelled customers and <NA> for the
-    1 673 to predict, `split` says which is which ("train" / "predict").
-    """
+    """Customers plus churn label (<NA> for the predict set) and a split column."""
     cust = load_customers(raw)
     labels = load_labels(raw)
     df = cust.merge(labels, on="customer_id", how="left")
@@ -86,7 +60,6 @@ def country_columns(df: pd.DataFrame) -> list[str]:
     return [c for c in df.columns if c.startswith(COUNTRY_PREFIX) and c != "country_other"]
 
 
-# --------------------------------------------------------------------------- share of wallet
 def _read_sow(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path).rename(columns={"n_transasctions": "n_transactions"})
     df["date"] = pd.to_datetime(df["year_month"], format="%m-%Y")
@@ -95,13 +68,7 @@ def _read_sow(path: Path) -> pd.DataFrame:
 
 
 def _aggregate(df: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
-    """Re-aggregate rows that became duplicates after renaming.
-
-    pos_perc / ecom_perc are recomputed as amount-weighted averages, not summed.
-    n_customers is summed, which can double count a customer that appeared under
-    both spellings in the same month. The merged rows carry a few hundred CHF
-    against monthly totals in the millions, so this does not move any share.
-    """
+    """Merge rows that became duplicates after renaming, pos/ecom as amount-weighted means."""
     df = df.assign(_pos=df["pos_perc"] * df["total_amount"], _ecom=df["ecom_perc"] * df["total_amount"])
     out = df.groupby(keys, as_index=False).agg(
         n_customers=("n_customers", "sum"),
@@ -119,20 +86,12 @@ def _aggregate(df: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
 
 
 def load_sow(raw: Path = RAW) -> pd.DataFrame:
-    """Month x category. Cleaning: typo in n_transactions, categories lower-cased
-    and aliases merged, 12-2020 dropped, duplicates re-aggregated."""
+    """Month x category."""
     return _aggregate(_read_sow(raw / "sow_category.csv"), ["date", "category"])
 
 
 def load_sow_counterpart(raw: Path = RAW) -> pd.DataFrame:
-    """Month x category x top counterpart. Same cleaning as load_sow, plus
-    counterpart spelling variants merged (brezelkönig, mcdonald's, amzn,
-    netflix.com) and two helper columns:
-
-    - counterpart_type: merchant / payment_provider / financial_provider / other
-    - counterpart_group: the group used in the SoW charts (coop, discounter, fuel,
-      revolut, crypto exchanges, ...), "other" where no group is defined
-    """
+    """Month x category x counterpart, with counterpart_type and counterpart_group."""
     df = _read_sow(raw / "sow_category_counterpart.csv")
     df["top_counterpart"] = df["top_counterpart"].str.strip().replace(M.COUNTERPART_ALIASES)
     out = _aggregate(df, ["date", "category", "top_counterpart"])
@@ -142,16 +101,12 @@ def load_sow_counterpart(raw: Path = RAW) -> pd.DataFrame:
 
 
 def monthly_active(sow: pd.DataFrame) -> pd.Series:
-    """Proxy for monthly active customers: the largest n_customers over the
-    categories of a month. n_customers is per category, a customer active in
-    three categories is counted three times across rows, so this is a lower bound."""
+    """Max n_customers over the categories of a month, a lower bound for active customers."""
     return sow.groupby("date")["n_customers"].max().rename("active_customers")
 
 
-# --------------------------------------------------------------------------- processed files
 def build_processed(out: Path = PROCESSED) -> list[Path]:
-    """Write the cleaned tables as CSV for non-Python use. Notebooks should
-    call the loaders instead."""
+    """Write the cleaned tables to data/processed as CSV."""
     from src.features import build_customer_features
 
     out.mkdir(parents=True, exist_ok=True)

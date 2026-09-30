@@ -1,11 +1,4 @@
-"""Write the cleaned tables to data/processed/ as CSV.
-
-    python src/clean_data.py
-
-The cleaning itself lives in src/data.py (loaders) and src/features.py, this
-script only calls them. Notebooks import the loaders directly and do not need
-the CSVs. See docs/data_preparation.md for what is cleaned and why.
-"""
+"""Writes the cleaned tables to data/processed/ as CSV. Usage: python src/clean_data.py"""
 
 import sys
 from pathlib import Path

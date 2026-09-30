@@ -1,12 +1,5 @@
-"""Name mappings shared by the loaders, the feature builder and the notebooks.
+"""Category and counterpart names and groups, see docs/data_preparation.md."""
 
-Everything that renames or groups a category or a counterpart lives here, so a
-decision is made once and every notebook sees the same names.
-"""
-
-# --------------------------------------------------------------------------- categories
-# The SoW files carry a few categories in a second spelling (capitalised, sometimes
-# German). They hold a few hundred CHF a month and belong to an existing category.
 CATEGORY_ALIASES = {
     "lebensmittel": "groceries",
     "restaurant": "restaurants",
@@ -14,7 +7,6 @@ CATEGORY_ALIASES = {
     "fitness": "wellness",
 }
 
-# The same duplicates exist as columns in customer_data.csv.
 CUSTOMER_COLUMN_MERGES = {
     "cat_lebensmittel": "cat_groceries",
     "cat_restaurant": "cat_restaurants",
@@ -22,8 +14,6 @@ CUSTOMER_COLUMN_MERGES = {
     "cat_fitness": "cat_wellness",
 }
 
-# --------------------------------------------------------------------------- counterparts
-# Same merchant, two spellings in the card descriptor.
 COUNTERPART_ALIASES = {
     "brezelkönig": "brezelkonig",
     "mcdonald's": "mcdonalds",
@@ -31,12 +21,8 @@ COUNTERPART_ALIASES = {
     "netflix.com": "netflix",
 }
 
-# Counterparts that are not merchants. A "sumup" transaction is a small shop or
-# restaurant using a SumUp terminal, "paypal" is a wallet in front of an unknown
-# merchant, "twint" is a P2P transfer or a wallet payment.
 PAYMENT_PROVIDERS = {"sumup", "paypal", "twint"}
 
-# Counterparts that are other financial providers: money leaving the bank.
 FINANCIAL_PROVIDERS = {"revolut", "binance", "coinbase", "postfinance", "ubs", "kantonalbank"}
 
 
@@ -50,8 +36,7 @@ def counterpart_type(name: str) -> str:
     return "merchant"
 
 
-# --------------------------------------------------------------------------- groups per category
-# Used for the share-of-wallet charts. Anything not listed falls into "other".
+# groups for the share of wallet charts, everything else is "other"
 LEAKAGE_GROUPS = {
     "revolut": "revolut",
     "binance": "crypto exchanges",
