@@ -55,6 +55,12 @@ Notebooks load the data through `src/data.py` (see `docs/data_preparation.md`). 
 python src/clean_data.py
 ```
 
+External series for the leakage story (bitcoin, SNB rates, FX), downloaded to `data/external/`, see `docs/external_data.md`:
+
+```bash
+python -m src.external.fetch
+```
+
 Checks that the cleaning holds:
 
 ```bash
@@ -83,6 +89,7 @@ deactivate
 │   ├── data.py             # loaders with all cleaning applied, use these in notebooks
 │   ├── features.py         # customer feature table
 │   ├── mappings.py         # category and counterpart names and groups
+│   ├── external/           # fetch and align external monthly series (issue 11)
 │   └── clean_data.py       # writes the cleaned tables to data/processed/ as CSV
 ├── dashboard/              # Streamlit app (issue 12)
 ├── figures/                # exported charts for the presentation
