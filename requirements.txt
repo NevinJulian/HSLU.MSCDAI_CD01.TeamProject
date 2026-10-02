@@ -1,10 +1,14 @@
 # Core data analysis
 pandas==2.3.3
-numpy==2.2.6
+numpy>=2.0
 
 # Plotting (used in the notebooks)
 matplotlib==3.10.9
 seaborn==0.13.2
+plotly>=5.20
+
+# Time series (SoW forecast, notebooks/05_sow)
+statsmodels>=0.14
 
 # Modeling (churn prediction, notebooks/08*)
 scikit-learn>=1.4
