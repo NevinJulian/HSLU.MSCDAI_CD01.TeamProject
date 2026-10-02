@@ -2,6 +2,11 @@
 pandas==2.3.3
 numpy==2.2.6
 
+# External data (src/external, issue 11): API downloads, the parquet table, Statista exports
+requests>=2.31
+pyarrow>=15
+openpyxl>=3.1   # reads the Statista .xlsx exports
+
 # Plotting (used in the notebooks)
 matplotlib==3.10.9
 seaborn==0.13.2
