@@ -13,6 +13,7 @@ xgboost>=2.0
 catboost>=1.2
 optuna>=3.6
 shap>=0.45
+statsmodels>=0.14
 
 # Running the .ipynb notebooks
 jupyter>=1.0
