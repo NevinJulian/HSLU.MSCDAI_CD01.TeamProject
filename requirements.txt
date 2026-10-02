@@ -7,9 +7,6 @@ matplotlib==3.10.9
 seaborn==0.13.2
 plotly>=5.20
 
-# Time series (SoW forecast, notebooks/05_sow)
-statsmodels>=0.14
-
 # Modeling (churn prediction, notebooks/08*)
 scikit-learn>=1.4
 lightgbm>=4.3
