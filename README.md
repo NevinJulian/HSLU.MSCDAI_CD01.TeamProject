@@ -63,7 +63,7 @@ pytest
 
 ### 5. Run the dashboard
 
-Needs the cleaned tables from step 4. The churn page also needs `results/`, written by `notebooks/08_churn.ipynb`; without it that page says so instead of failing.
+Needs the cleaned tables from step 4. The segments page (and the segment breakdowns elsewhere) needs `data/processed/customer_clusters.csv` from `notebooks/07_segments.ipynb`, the churn page needs `results/` from `notebooks/08_churn.ipynb`. Without them those parts say so instead of failing.
 
 ```bash
 streamlit run dashboard/app.py

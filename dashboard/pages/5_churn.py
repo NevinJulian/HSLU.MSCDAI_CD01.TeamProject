@@ -1,7 +1,8 @@
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from shared import PALETTE, require
+from shared import PALETTE, customers, has_segments, require
 
 st.set_page_config(page_title="Churn", layout="wide")
 st.title("Churn")
@@ -46,6 +47,28 @@ st.caption(
     "Customer ids are withheld. Issue 12 allows aggregated or masked ids only, and these "
     "pages get screenshotted for the submission (README, Workflow)."
 )
+
+feats = customers()
+if has_segments(feats):
+    st.subheader("Churn by segment")
+    seg = preds[["customer_id", "churn_probability"]].merge(feats[["customer_id", "cluster_name"]], on="customer_id")
+    rates = pd.concat(
+        [
+            feats[feats["split"] == "train"].groupby("cluster_name", observed=True)["churned"].mean().rename("observed, labelled"),
+            seg.groupby("cluster_name", observed=True)["churn_probability"].mean().rename("predicted, to predict"),
+        ],
+        axis=1,
+    ).reset_index().melt("cluster_name", var_name="measure", value_name="churn_rate")
+    fig = px.bar(
+        rates, x="cluster_name", y="churn_rate", color="measure", barmode="group",
+        color_discrete_sequence=[PALETTE[0], PALETTE[1]],
+    )
+    fig.update_layout(yaxis_tickformat=".0%", xaxis_title=None, yaxis_title="churn rate", legend_title_text=None)
+    st.plotly_chart(fig, width="stretch")
+    st.caption(
+        "Observed rate on the labelled customers next to the mean predicted probability of the customers "
+        "to predict. Similar bars mean the model carries the segment pattern over to the hand-in set."
+    )
 
 with st.expander("Show all models"):
     st.dataframe(models)

@@ -11,6 +11,7 @@ TABLES = {
     "customer_features": "processed",
     "sow_category_clean": "processed",
     "sow_category_counterpart_clean": "processed",
+    "customer_clusters": "processed",
     "churn_models": "results",
     "churn_predictions": "results",
 }
@@ -18,6 +19,10 @@ TABLES = {
 DOCS = {
     "Cleaning": ROOT / "docs" / "data_preparation.md",
     "Assumptions": ROOT / "docs" / "assumptions.md",
+    "Leakage": ROOT / "docs" / "leakage_findings.md",
+    "Segments": ROOT / "docs" / "segments.md",
+    "Leakage & churn": ROOT / "docs" / "leakage_churn.md",
+    "Churn": ROOT / "docs" / "churn.md",
 }
 
 sources, *doc_tabs = st.tabs(["Sources", *DOCS])
@@ -32,8 +37,8 @@ with sources:
             rows.append({"table": name, "from": source, "rows": None, "columns": None})
     st.dataframe(pd.DataFrame(rows), width="stretch")
     st.caption(
-        "Cleaned tables come from `python src/clean_data.py`, model output from the churn "
-        "notebooks. data/ and results/ are gitignored, so no customer ids live in the repo."
+        "Cleaned tables come from `python src/clean_data.py`, segments from "
+        "notebooks/07_segments.ipynb, model output from the churn notebooks. data/ and results/ are gitignored, so no customer ids live in the repo."
     )
 
 for tab, path in zip(doc_tabs, DOCS.values()):
