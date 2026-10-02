@@ -1,5 +1,3 @@
-"""Checks on the churn helpers: feature matrix hygiene and hand-in validation."""
-
 import numpy as np
 import pytest
 
