@@ -61,7 +61,15 @@ Checks that the cleaning holds:
 pytest
 ```
 
-### 5. Deactivating
+### 5. Run the dashboard
+
+Needs the cleaned tables from step 4. The churn page also needs `results/`, written by `notebooks/08_churn.ipynb`; without it that page says so instead of failing.
+
+```bash
+streamlit run dashboard/app.py
+```
+
+### 6. Deactivating
 
 ```bash
 deactivate

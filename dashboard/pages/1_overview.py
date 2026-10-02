@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from shared import apply_filters, require, sidebar_filters
+from shared import PALETTE, apply_filters, require, sidebar_filters
 
 st.set_page_config(page_title="Overview", layout="wide")
 st.title("Overview")
@@ -29,7 +29,8 @@ sow["date"] = pd.to_datetime(sow["date"])
 # n_customers is per category; the max across categories in a month is a lower
 # bound on monthly active customers (see src/data.py:monthly_active).
 active = sow.groupby("date")["n_customers"].max().reset_index(name="active_customers")
-st.plotly_chart(px.line(active, x="date", y="active_customers"), use_container_width=True)
+fig = px.line(active, x="date", y="active_customers", color_discrete_sequence=PALETTE)
+st.plotly_chart(fig, width="stretch")
 
 with st.expander("Show data"):
     st.dataframe(active)

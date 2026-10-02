@@ -12,8 +12,9 @@ st.markdown(
     - **Overview** — activity, spend, churn and leakage at a glance
     - **Share of wallet** — counterpart shares per category over time
     - **Wallet leakage** — where money leaves the wallet
-    - **Segments** — cluster map and profiles
     - **Churn** — model comparison and risk ranking
-    - **Data & method** — sources, cleaning, CRISP-DM mapping
+    - **Data & method** — sources, cleaning, assumptions
+
+    Segments (cluster map and profiles) follows once the segmentation work lands.
     """
 )
