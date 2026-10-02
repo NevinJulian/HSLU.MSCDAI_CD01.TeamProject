@@ -103,11 +103,16 @@ def sources() -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------- YAPEAL side
-def leakage_monthly() -> pd.DataFrame:
+def leakage_monthly(sow: pd.DataFrame | None = None, cp: pd.DataFrame | None = None) -> pd.DataFrame:
     """Per month: card spend, active customers, and per leakage destination the
     amount, its share of all card spend and the customers sending money there
-    (also as % of monthly active). cash + savings, assumption A1."""
-    sow, cp = load_sow(), load_sow_counterpart()
+    (also as % of monthly active). cash + savings, assumption A1.
+
+    Without arguments it uses the loaders. The dashboard passes the cleaned
+    tables from data/processed (sow_category_clean, sow_category_counterpart_clean)
+    instead, which carry the same columns with `date` as text."""
+    sow = load_sow() if sow is None else sow.assign(date=pd.to_datetime(sow["date"]))
+    cp = load_sow_counterpart() if cp is None else cp.assign(date=pd.to_datetime(cp["date"]))
     out = sow.groupby("date")["total_amount"].sum().rename("spend").to_frame().join(monthly_active(sow))
 
     fin = cp[cp["category"].isin(["cash", "savings"])]

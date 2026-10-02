@@ -36,6 +36,17 @@ def test_leakage_monthly_shares():
     assert leak["leak_all_share"].between(0, 1).all()
 
 
+def test_leakage_monthly_same_from_processed_tables():
+    """The dashboard builds the leakage series from the CSVs in data/processed."""
+    from src.data import PROCESSED
+
+    sow_csv, cp_csv = PROCESSED / "sow_category_clean.csv", PROCESSED / "sow_category_counterpart_clean.csv"
+    if not (sow_csv.exists() and cp_csv.exists()):
+        pytest.skip("run python src/clean_data.py first")
+    from_files = leakage_monthly(pd.read_csv(sow_csv), pd.read_csv(cp_csv))
+    pd.testing.assert_frame_equal(from_files, leakage_monthly(), check_freq=False)
+
+
 def test_read_google_trends(tmp_path):
     path = tmp_path / "google_trends.csv"
     path.write_text("Category: All categories\n\nMonth,Revolut: (Switzerland),Yuh: (Switzerland)\n2021-01,40,<1\n2021-02,42,3\n")
